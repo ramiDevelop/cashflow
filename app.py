@@ -57,10 +57,11 @@ with st.sidebar.form("update_form"):
     # Select record by serial number (index)
     update_payment_index = st.selectbox("Select Record to Update", st.session_state['payments'].index)
     
+    # Convert the selected index to an integer if it's a valid selection
     try:
-        update_payment_index = int(update_payment_index)  # Explicitly ensure it's an integer
+        update_payment_index = int(update_payment_index)
     except ValueError:
-        update_payment_index = None
+        st.sidebar.error("Invalid index selected. Please try again.")
     
     if update_payment_index is not None:
         update_payment = st.session_state['payments'].iloc[update_payment_index]
@@ -79,7 +80,7 @@ with st.sidebar.form("update_form"):
             st.session_state['payments'] = reset_index(st.session_state['payments'])
             st.sidebar.success(f"Payment status updated for {update_customer_name} on {update_payment_date}.")
     else:
-        st.sidebar.error("Please select a valid payment record.")
+        st.sidebar.warning("Please select a valid record.")
 
 # Delete record form
 with st.sidebar.form("delete_form"):
