@@ -54,33 +54,30 @@ with st.sidebar.form("create_form"):
 with st.sidebar.form("update_form"):
     st.header("Update Payment Record - Transferred to Bank")
     
-    # Select record by serial number (integer index)
-    update_payment_index = st.selectbox("Select Record to Update", range(len(st.session_state['payments'])))
+    # Select record by serial number (index)
+    update_payment_index = st.selectbox("Select Record to Update", st.session_state['payments'].index)
     
-    # Get the selected payment record
     update_payment = st.session_state['payments'].iloc[update_payment_index]
     update_payment_date = update_payment['Date']
     update_customer_name = update_payment['Customer Name']
     
-    # Checkbox for updating 'Transferred to Bank' status
     updated_transferred_to_bank = st.checkbox("Transferred to Bank", value=(update_payment['Transferred to Bank'] == 'Yes'))
     
     update_button = st.form_submit_button("Update Payment Status")
 
     if update_button:
-        # Update the payment status in the DataFrame
+        # Update the payment status
         st.session_state['payments'].at[update_payment_index, "Transferred to Bank"] = "Yes" if updated_transferred_to_bank else "No"
         st.session_state['payments'].at[update_payment_index, "Status"] = "Transferred to Bank" if updated_transferred_to_bank else f"Waiting Payment from {update_payment['Received By']}"
         
-        # Reset index and refresh the state
         st.session_state['payments'] = reset_index(st.session_state['payments'])
         st.sidebar.success(f"Payment status updated for {update_customer_name} on {update_payment_date}.")
 
 # Delete record form
 with st.sidebar.form("delete_form"):
     st.header("Delete Payment Record")
-    # Select record by serial number (integer index)
-    delete_index = st.selectbox("Select Record to Delete", range(len(st.session_state['payments'])))
+    # Select record by serial number (index)
+    delete_index = st.selectbox("Select Record to Delete", st.session_state['payments'].index)
     delete_button = st.form_submit_button("Delete Payment")
 
     if delete_button:
