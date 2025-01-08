@@ -57,21 +57,29 @@ with st.sidebar.form("update_form"):
     # Select record by serial number (index)
     update_payment_index = st.selectbox("Select Record to Update", st.session_state['payments'].index)
     
-    update_payment = st.session_state['payments'].iloc[update_payment_index]
-    update_payment_date = update_payment['Date']
-    update_customer_name = update_payment['Customer Name']
+    try:
+        update_payment_index = int(update_payment_index)  # Explicitly ensure it's an integer
+    except ValueError:
+        update_payment_index = None
     
-    updated_transferred_to_bank = st.checkbox("Transferred to Bank", value=(update_payment['Transferred to Bank'] == 'Yes'))
-    
-    update_button = st.form_submit_button("Update Payment Status")
-
-    if update_button:
-        # Update the payment status
-        st.session_state['payments'].at[update_payment_index, "Transferred to Bank"] = "Yes" if updated_transferred_to_bank else "No"
-        st.session_state['payments'].at[update_payment_index, "Status"] = "Transferred to Bank" if updated_transferred_to_bank else f"Waiting Payment from {update_payment['Received By']}"
+    if update_payment_index is not None:
+        update_payment = st.session_state['payments'].iloc[update_payment_index]
+        update_payment_date = update_payment['Date']
+        update_customer_name = update_payment['Customer Name']
         
-        st.session_state['payments'] = reset_index(st.session_state['payments'])
-        st.sidebar.success(f"Payment status updated for {update_customer_name} on {update_payment_date}.")
+        updated_transferred_to_bank = st.checkbox("Transferred to Bank", value=(update_payment['Transferred to Bank'] == 'Yes'))
+        
+        update_button = st.form_submit_button("Update Payment Status")
+
+        if update_button:
+            # Update the payment status
+            st.session_state['payments'].at[update_payment_index, "Transferred to Bank"] = "Yes" if updated_transferred_to_bank else "No"
+            st.session_state['payments'].at[update_payment_index, "Status"] = "Transferred to Bank" if updated_transferred_to_bank else f"Waiting Payment from {update_payment['Received By']}"
+            
+            st.session_state['payments'] = reset_index(st.session_state['payments'])
+            st.sidebar.success(f"Payment status updated for {update_customer_name} on {update_payment_date}.")
+    else:
+        st.sidebar.error("Please select a valid payment record.")
 
 # Delete record form
 with st.sidebar.form("delete_form"):
